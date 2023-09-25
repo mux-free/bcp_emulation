@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Define root directory, and output directory
+in_dir="/net/helium/atmosdyn/IFS-1Y"
+out_dir="/net/helium/atmosdyn/freimax/data_msc/IFS-18/extracted_fields"
+
+# Define month list
+month_list=("DEC17" "JAN18" "FEB18" "MAR18" "APR18" "MAY18" "JUN18" "JUL18" "AUG18" "SEP18" "OCT18" "NOV18")
+
+# List of P-file variables to extract
+p_variables=("tsubi" "tsubs" "tmelti" "tmelts" "tevr" "SWC" "IWC" "RWC" "CC" "Q" "T" "OMEGA" "PS" "SLP")
+
+# List of S-file variables to extract
+s_variables=("TH" "PV")
+
+# Loop over the months
+for month_name in "${month_list[@]}"; do
+	echo Start extracting $month_name
+    # Define the month directory
+    month_dir=$in_dir/$month_name
+
+    # Check if it is a directory
+    if [ -d "$month_dir" ]; then
+        # Create the corresponding output directory
+        mkdir -p $out_dir/$month_name
+
+        # Loop through each P-file in the current month
+        for p_file in "$month_dir/cdf/P"*; do
+            # Extract P-file variables
+            for p_var in "${p_variables[@]}"; do
+                output_file="$out_dir/$month_name/$(basename "$p_file")_${p_var}"
+                ncks -v "$p_var" "$p_file" -O "$output_file"
+            done
+        done
+
+        # Loop through each S-file in the current month
+        for s_file in "$month_dir/cdf/S"*; do
+            # Extract S-file variables
+            for s_var in "${s_variables[@]}"; do
+                output_file="$out_dir/$month_name/$(basename "$s_file")_${s_var}"
+                ncks -v "$s_var" "$s_file" -O "$output_file"
+            done
+        done
+
+        echo "Done with $month_name"
+    else
+        echo "Directory not found: $month_dir"
+    fi
+done
+

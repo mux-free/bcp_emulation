@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Specify the parent directory containing the monthly folders
+parent_dir="/net/helium/atmosdyn/IFS-1Y"
+
+# Create the output directory
+output_dir="/home/freimax/msc_thesis/data/IFS-18/cyclones/cyclone_masks"
+mkdir -p "${output_dir}"
+
+
+# Specify the list of subfolder names to access
+month_list=("JAN18" "FEB18" "MAR18" "APR18" "MAY18" "JUN18" "JUL18" "AUG18" "SEP18" "OCT18" "NOV18" "DEC18")
+
+# Loop through each subfolder name
+for subfolder in "${month_list[@]}"; do
+    # Construct the subfolder path
+    subfolder_path="${parent_dir}/${subfolder}"
+    
+    # Specify the output file name for the merged masks of the current subfolder
+    output_file="${output_dir}/cyclone_mask_${subfolder}.nc"
+    # Merge all cyclone masks for the current subfolder
+    cdo mergetime "${subfolder_path}/features"/*.nc "${output_file}"
+    
+    echo "Merged masks for ${subfolder} saved to ${output_file}"
+done

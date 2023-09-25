@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Define root directory, output directory, and working directory
+
+#in_dir="/net/helium/atmosdyn/IFS-1Y"
+in_dir="/net/helium/atmosdyn/freimax/data_msc/test_dir"
+
+#out_dir="/net/helium/atmosdyn/freimax/data_msc/IFS-18/extracted_fields"
+out_dir="/net/helium/atmosdyn/freimax/data_msc/test_dir/test_out"
+
+work_dir="$out_dir/wrk"
+
+# Create working directory if it doesn't exist
+mkdir -p "$work_dir"
+
+# Define month list
+#month_list=("JAN18" "FEB18" "MAR18" "APR18" "MAY18" "JUN18" "JUL18" "AUG18" "SEP18" "OCT18" "NOV18")
+month_list=("DEC17" "JAN18")
+
+# List of P-file variables to extract
+p_variables=("tsubi" "tsubs" "tmelti" "tmelts" "tevr" "SWC" "IWC" "RWC" "CC" "Q" "T" "OMEGA" "PS" "SLP")
+
+# List of S-file variables to extract
+s_variables=("TH" "PV")
+
+
+# Loop over the months
+for month_name in "${month_list[@]}"; do
+    # Define the month directory
+    month_dir=$in_dir/$month_name
+
+    echo "Start processing ${month_name}"
+    
+    # Check if it is a directory
+    if [ -d "$month_dir" ]; then
+            # Create the corresponding output directory
+            mkdir -p $out_dir/$month_name
+
+            # Loop through each P-file in the current month
+            for p_file in "$month_dir/cdf/P"*; do
+                    echo "Extracting the file ${p_file}"
+		    # Extract P-file variables
+                    for p_var in "${p_variables[@]}"; do
+                            output_file="$work_dir/${p_var}_$(basename "$p_file")"
+                            ncks -v "$p_var" "$p_file" -O "$output_file"
+                    done
+                
+                    # Merge variables and move to final location
+                    ncecat -O $work_dir/*_"$(basename "$p_file")" "$out_dir/$month_name/$(basename "$p_file")"
+		    echo "Merging the file {$(basename "$p_file")"
+                    # Clean up working directory
+                    #rm "$work_dir/*"
+            done
+    else
+        echo "Directory not found: $month_dir"
+    fi
+    
+    # Loop through each S-file in the current month
+    for s_file in "$month_dir/cdf/S"*; do
+        # Extract S-file variables
+        for s_var in "${s_variables[@]}"; do
+            output_file="$work_dir/${s_var}_$(basename "$s_file")"
+            ncks -v "$s_var" "$s_file" -O "$output_file"
+
+            # Merge variables and move to final location
+            #ncecat -O $work_dir/*_"$(basename "$s_file")" "$out_dir/$month_name/$(basename "$s_file")"
+            cdo merge $work_dir/*_"$(basename "$p_file")" "$out_dir/$month_name/$(basename "$p_file")"
+
+            # Clean up working directory
+            #rm -r "$work_dir/*"
+        done
+    done
+
+    echo "Done with $month_name"
+done
+

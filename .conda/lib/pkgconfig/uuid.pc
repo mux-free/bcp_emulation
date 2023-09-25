@@ -1,0 +1,11 @@
+prefix=/home/freimax/msc_thesis/scripts/.conda
+exec_prefix=/home/freimax/msc_thesis/scripts/.conda
+libdir=/home/freimax/msc_thesis/scripts/.conda/lib
+includedir=/home/freimax/msc_thesis/scripts/.conda/include
+
+Name: uuid
+Description: Universally unique id library
+Version: 2.38.1
+Requires:
+Cflags: -I${includedir}/uuid
+Libs: -L${libdir} -luuid

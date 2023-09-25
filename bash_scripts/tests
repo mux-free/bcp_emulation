@@ -1,0 +1,12 @@
+#!/bin/bash
+
+month_list=("DEC17" "JAN18" "FEB18" "MAR18" "APR18" "MAY18" "JUN18" "JUL18" "AUG18" "SEP18" "OCT18" "NOV18")
+p_variables=("tsubi" "tsubs" "tmelti" "tmelts" "tevr" "SWC" "IWC" "RWC" "CC" "Q" "T" "OMEGA" "PS" "SLP")
+
+ # Create a string with comma-separated variables
+IFS=','        
+p_var_str="${p_variables[*]}"        
+unset IFS
+
+echo $month_list
+echo $p_var_str

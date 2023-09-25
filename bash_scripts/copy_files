@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Specify the parent directory containing the monthly folders
+parent_dir="/net/helium/atmosdyn/IFS-1Y"
+
+# Specify the list of month names
+month_list=("JAN" "FEB" "MAR" "APR" "MAY" "JUN" "JUL" "AUG" "SEP" "OCT" "NOV" "DEC")
+
+# Specify the destination directory
+destination_dir="/home/freimax/msc_thesis/data/IFS-18/cyclones"
+mkdir -p $destination_dir
+
+# Loop through each month name
+for month in "${month_list[@]}"; do
+    # Specify the source file path
+    source_file="${parent_dir}/${month}18/features/tracking/CYCLONES.nc"
+
+    # Specify the destination file name
+    destination_file="${destination_dir}/CYCLONES_${month}18"
+
+    # Copy the source file to the destination directory
+    cp "${source_file}" "${destination_file}"
+
+    echo "Copied ${source_file} to ${destination_file}"
+done
+
